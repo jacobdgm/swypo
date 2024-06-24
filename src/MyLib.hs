@@ -1,4 +1,5 @@
 module MyLib (someFunc) where
+import Data.Maybe
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -8,6 +9,7 @@ data Point = P {
     getY :: Int
 } deriving Show
 
+keyLetterPositions :: [(Char, Point)]
 keyLetterPositions = [
     ('q', P 0 0),
     ('w', P 2 0),
@@ -38,3 +40,18 @@ keyLetterPositions = [
     ('n', P 13 2),
     ('m', P 15 2)
     ]
+
+findPointForLetter :: Char -> Maybe Point
+findPointForLetter = flip lookup keyLetterPositions
+
+findPointsForWord :: [Char] -> [Point]
+findPointsForWord word = catMaybes (map findPointForLetter word)
+
+telescopeWord :: [Char] -> [Char]
+telescopeWord [] = []
+telescopeWord [x] = [x]
+telescopeWord (x : y : zs) = if x == y then telescopeWord (y : zs) else x : (telescopeWord (y : zs))
+
+-- asdf == asf == adf == af
+-- adsf /= af since jog in the middle
+-- afd /= af since different end letter
