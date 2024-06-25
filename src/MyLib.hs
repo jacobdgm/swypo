@@ -10,13 +10,12 @@ data Point = P {
     getY :: Int
 } deriving (Show, Eq)
 
--- data LetterPosition = LP {
---     getRow :: Int 
---     getPosition :: Int, -- i.e., the position within the row
--- } deriving Show
-
 qwertyLetterPositions :: [(Char, Point)]
 qwertyLetterPositions = [
+    -- The top row is y = 0, and the rows beneath it are y = 1 and y = 2.
+    -- In the screenshot we're working from (at https://support.google.com/crowdsource/answer/10279623?hl=en),
+    -- the top row is offset from the second two rows, which accounts for
+    -- the x values of all the letters.
     ('q', P 0 0),
     ('w', P 2 0),
     ('e', P 4 0),
@@ -47,25 +46,18 @@ qwertyLetterPositions = [
     ('m', P 15 2)
     ]
 
--- dvorakLetterPositions :: [(Char, LetterPosition)]
--- dvorakLetterPositions = [
---     ('p', LP 0 0),
---     ]
-
 findPointForLetter :: Char -> Maybe Point
 findPointForLetter = flip lookup qwertyLetterPositions
 
 findPointsForWord :: [Char] -> [Point]
 findPointsForWord word = catMaybes (map findPointForLetter word)
 
--- telescopeWord :: [Char] -> [Char]
--- telescopeWord [] = []
--- telescopeWord [x] = [x]
--- telescopeWord (x : y : zs) = if x == y then telescopeWord (y : zs) else x : (telescopeWord (y : zs))
-
-directedColinear :: Point -> Point -> Point -> Bool
-directedColinear (P x1 y1) (P x2 y2) (P x3 y3) =
+directedCollinear :: Point -> Point -> Point -> Bool
+directedCollinear (P x1 y1) (P x2 y2) (P x3 y3) =
     if y1 /= y2 || y2 /= y3 then False
+        -- since the top row of the keyboard is offset from the bottom two rows,
+        -- a line connecting a letter in the top row to a line in the bottom row
+        -- cannot be collinear with a letter in the middle row. 
     else
         if xs == sortedXs then True
         else xs == reverse sortedXs
@@ -78,9 +70,5 @@ findCanonicalPath :: [Point] -> [Point]
 findCanonicalPath [] = []
 findCanonicalPath [x] = [x]
 findCanonicalPath [x, y] = if x == y then [x] else [x, y]
-findCanonicalPath (w : x : y : zs) = if directedColinear w x y then findCanonicalPath (w : y : zs) else w : (findCanonicalPath (x : y : zs))
- 
+findCanonicalPath (w : x : y : zs) = if directedCollinear w x y then findCanonicalPath (w : y : zs) else w : (findCanonicalPath (x : y : zs))
 
--- asdf == asf == adf == af
--- adsf /= af since jog in the middle
--- afd /= af since different end letter
