@@ -1,5 +1,6 @@
 module MyLib (someFunc) where
 import Data.Maybe
+import Data.List
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -7,10 +8,15 @@ someFunc = putStrLn "someFunc"
 data Point = P {
     getX :: Int,
     getY :: Int
-} deriving Show
+} deriving (Show, Eq)
 
-keyLetterPositions :: [(Char, Point)]
-keyLetterPositions = [
+-- data LetterPosition = LP {
+--     getRow :: Int 
+--     getPosition :: Int, -- i.e., the position within the row
+-- } deriving Show
+
+qwertyLetterPositions :: [(Char, Point)]
+qwertyLetterPositions = [
     ('q', P 0 0),
     ('w', P 2 0),
     ('e', P 4 0),
@@ -41,16 +47,39 @@ keyLetterPositions = [
     ('m', P 15 2)
     ]
 
+-- dvorakLetterPositions :: [(Char, LetterPosition)]
+-- dvorakLetterPositions = [
+--     ('p', LP 0 0),
+--     ]
+
 findPointForLetter :: Char -> Maybe Point
-findPointForLetter = flip lookup keyLetterPositions
+findPointForLetter = flip lookup qwertyLetterPositions
 
 findPointsForWord :: [Char] -> [Point]
 findPointsForWord word = catMaybes (map findPointForLetter word)
 
-telescopeWord :: [Char] -> [Char]
-telescopeWord [] = []
-telescopeWord [x] = [x]
-telescopeWord (x : y : zs) = if x == y then telescopeWord (y : zs) else x : (telescopeWord (y : zs))
+-- telescopeWord :: [Char] -> [Char]
+-- telescopeWord [] = []
+-- telescopeWord [x] = [x]
+-- telescopeWord (x : y : zs) = if x == y then telescopeWord (y : zs) else x : (telescopeWord (y : zs))
+
+directedColinear :: Point -> Point -> Point -> Bool
+directedColinear (P x1 y1) (P x2 y2) (P x3 y3) =
+    if y1 /= y2 || y2 /= y3 then False
+    else
+        if xs == sortedXs then True
+        else xs == reverse sortedXs
+        where
+            xs = [x1, x2, x3]
+            sortedXs = sort xs
+        
+
+findCanonicalPath :: [Point] -> [Point]
+findCanonicalPath [] = []
+findCanonicalPath [x] = [x]
+findCanonicalPath [x, y] = if x == y then [x] else [x, y]
+findCanonicalPath (w : x : y : zs) = if directedColinear w x y then findCanonicalPath (w : y : zs) else w : (findCanonicalPath (x : y : zs))
+ 
 
 -- asdf == asf == adf == af
 -- adsf /= af since jog in the middle
