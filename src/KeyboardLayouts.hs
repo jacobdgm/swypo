@@ -1,11 +1,13 @@
-module KeyboardLayouts (qwertyLetterPositions, Point(Point)) where
+module KeyboardLayouts (KeyboardLayout, qwertyLetterPositions, Point(Point)) where
 
 data Point = Point {
     getX :: Int,
     getY :: Int
 } deriving (Show, Eq)
 
-qwertyLetterPositions :: [(Char, Point)]
+type KeyboardLayout = [(Char, Point)]
+
+qwertyLetterPositions :: KeyboardLayout
 qwertyLetterPositions = [
     -- The top row is y = 0, and the rows beneath it are y = 1 and y = 2.
     -- In the screenshot we're working from (at https://support.google.com/crowdsource/answer/10279623?hl=en),
