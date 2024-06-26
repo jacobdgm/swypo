@@ -1,7 +1,28 @@
 module MyLib (someFunc) where
 import Data.Maybe
 import Data.List
-import KeyboardLayouts (Point(Point), qwertyLetterPositions)
+import KeyboardLayouts (KeyboardLayout, Point(Point), qwertyLetterPositions)
+
+type Vocabulary = [String]
+
+getScoresForKeyboards :: Vocabulary -> [KeyboardLayout] -> [ScoringFunction] -> [Float] -- eventually, turn this into [Score]
+getScoresForKeyboards _vocabulary [] _scoringFunction = []
+getScoresForKeyboards vocabulary (layout:layouts) scoringFunctions =
+    getScoresForKeyboard vocabulary layout scoringFunctions
+    ++ getScoresForKeyboards vocabulary layouts scoringFunctions
+
+getScoresForKeyboard :: Vocabulary -> KeyboardLayout -> [ScoringFunction] -> [Float] -- eventually, turn this into [partial Score]
+getScoresForKeyboard vocabulary layout scoringFunctions =
+    map (getScoreForKeyboard vocabulary layout) scoringFunctions 
+
+type Score = (KeyboardLayout, ScoringFunction, Float)
+
+getScoreForKeyboard :: Vocabulary -> KeyboardLayout -> ScoringFunction -> Float 
+getScoreForKeyboard = undefined
+
+type ScoringFunction = [[Point]] -> Float
+
+type Trail = [Point]
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
